@@ -206,12 +206,110 @@ var m8 = maker(50, 2)       // localVar = 50, b = 2 としてコピーが生成
 print(m8(), globalCount)    // 13, 1001
 print(m8(), globalCount)    // 52, 1002
 
+//: ## Closures Are Reference Types
+
+let makerA = maker(10, 1)   // makerA には closure への参照が格納
+let alsoMakerA = makerA     // alsoMakerA に closure への参照がコピーされる
+makerA()        // 11
+alsoMakerA()    // 12
 
 
+/*:
+## Escaping Closures
+- escape: 関数の引数としてクロージャを渡したとき，その関数がリターンした後にクロージャが呼び出されること
+*/
 
-//: ## Escaping Closures
+var theFunction:((Int) -> Int)! = nil
+func doFunc(_ value: Int, _ function: (Int) -> (Int)) { print(function(value)) }
+//func setFunttion(_ function: (Int) -> Int ) { theFunction = function }  // error
+func setFunttion(_ function: @escaping (Int) -> Int ) { theFunction = function }
 
-//: ## Autoclosures
+//  escape するクロージャに inout の引数を含めることはできない
+func dungeon(level: inout Int) {
+//    setFunttion( { level + $0 } )     // error
+    setFunttion( { [level] in level + $0 } )  // キャプチャリストでコピーを渡す
+}
+
+
+/*:
+ ## Autoclosures
+ - autoclosure: 関数に引数として渡された式をラップするために自動で生成された closure
+   - 関数のパラメータを囲む括弧を省略できる
+   - オートクロージャを取る関数を呼び出すのは一般的だが，実装するのは一般的ではない
+
+ - 例) assert(condition:message:file:line:)
+   - condition と message に autoclosure
+     - condition: evaluated only in debug builds
+     - message: evaluated only if condition is false
+ 
+ 利点: autoclosure は以下のような処理を評価するタイミングをコントロールできる
+ - 副作用を持つ処理
+ - computationally expensive
+
+ refs:
+ - https://qiita.com/shimesaba/items/b1baced2ec3d9244b2c9
+ - https://www.swiftbysundell.com/posts/using-autoclosure-when-designing-swift-apis
+ */
+
+
+// クロージャの遅延評価の例
+var customerInLine = ["Chris", "Alex", "Ewa", "Barry", "Daniella"]
+print(customerInLine)  // 5
+
+let customerProvider = { customerInLine.remove(at: 0) }
+print(customerInLine.count)  // 5, closure は呼び出されるまで評価されていない
+
+print(customerProvider())  // Chris
+print(customerInLine.count)  // 4
+
+
+// 関数の引数としてクロージャを渡したときも同様の振る舞い
+// customersInLine is ["Alex", "Ewa", "Barry", "Daniella"]
+func serve(customer customerProvider: () -> String) {
+    print(customerProvider())
+}
+serve(customer: { customerInLine.remove(at: 0) } )  // Alex
+
+// Autoclosure の例
+// customersInLine is ["Alex", "Ewa", "Barry", "Daniella"]
+func serveWithAutoClosure(customer customerProvider: @autoclosure () -> String) {
+    print(customerProvider())
+}
+serveWithAutoClosure(customer: customerInLine.remove(at: 0))    // Ewa
+
+// autoclosure and escaping
+var customerProviders: [() -> String] = []
+func collectCustomerProviders(_ customerProvider: @autoclosure @escaping () -> String) {
+    customerProviders.append(customerProvider)
+}
+collectCustomerProviders(customerInLine.remove(at: 0))
+collectCustomerProviders(customerInLine.remove(at: 0))
+
+print(customerProviders.count)  // 2
+for customerProvider in customerProviders {
+    print(customerProvider())
+}
+// Barry, Daniella
+
+
+// 遅延評価を用いてハイコストな関数の呼び出しをコントロールする例
+func highCostFunction(_ value: Int) -> Int {
+    print("high cost")
+    return value
+}
+
+// highCostFunctionの評価結果が skip に渡される
+func skip(condition: Bool, _ arg: Int) {
+    if !condition { print(arg) }
+}
+skip(condition: true, highCostFunction(10000))  // Prints "high cost"
+
+// highCostFunction(10000) が skipWithAutoclosure に渡され，condition が false のときだけ評価される
+func skipWithAutoclosure(condition: Bool, _ arg: @autoclosure () -> Int) {
+    if !condition { print(arg()) }
+}
+skipWithAutoclosure(condition: true, highCostFunction(10000))   // 何も表示されない
+
 
 
 //: ## Overload された関数の区別
@@ -234,6 +332,7 @@ f2("fugafuga")  // [hoge] "fugafuga"
 f3("a", "bb", "ccc", "dddd")  // a bb ccc dddd
 
 
+//: ## その他
 // Optional type の Closure
 var optionalClosure: ((Int, Int) -> Double)?
 
