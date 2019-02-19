@@ -2,7 +2,7 @@
 
 import Foundation
 
-/// Enumeration Syntax
+//: ## Enumeration Syntax
 enum CompassPoint {
     case north
     case south
@@ -10,15 +10,16 @@ enum CompassPoint {
     case west
 }
 
-/// Enumeration types は単数形
+// Enumeration types は単数形の名前をつける
 var directionToHead = CompassPoint.west
 
-/// 型が決まっている場合は省略可能
+// 型が決まっている場合は型を省略可能
 var directionHead2: CompassPoint = .west
 
 
-/// Matching Enumeration Values with a Switch Statement
-/// すべての列挙ケースが網羅されているため，default は不要
+//: ## Matching Enumeration Values with a Switch Statement
+
+// すべての列挙ケースが網羅されているため，default は不要
 directionToHead = .south
 switch directionToHead {
 case .north:
@@ -33,7 +34,7 @@ case .west:
 /// Prints "Watch out for penguins"
 
 
-/// Iterating over Enumeration Cases
+//: ## Iterating over Enumeration Cases
 enum Beverage: CaseIterable {
     case coffee, tea, juice
 }
@@ -50,7 +51,7 @@ for beverage in Beverage.allCases {
 // juice
 
 
-/// Assoccitated Values
+//: ## Assoccitated Values
 
 enum Barcode {
     case upc(Int, Int, Int, Int)
@@ -77,7 +78,7 @@ case let .qrCode(productCode):
 // Prints "QR code: ABCDEFGHIJKLMNOP."
 
 
-/// Raw Values
+//: ## Raw Values
 
 enum ASCIIControlCharacter: Character {
     case tab = "\t"
@@ -85,13 +86,15 @@ enum ASCIIControlCharacter: Character {
     case carriageReturn = "\r"
 }
 
-/// Implicitly Assigned Raw Values
+// Implicitly Assigned Raw Values
 enum Planet: Int {
     case mercury = 1, venus, earth, mars, jupiter, saturn, uranus, neptune
+    // marcury = 1, venus = 2, and so on
 }
 
 enum CompassPoint2: String {
     case north, south, east, west
+    // rawValue もそのまま north, south, ...
 }
 
 let earthsOrder = Planet.earth.rawValue
@@ -101,7 +104,7 @@ let sunsetDirection = CompassPoint2.west.rawValue
 // sunsetDirection is "west"
 
 
-/// Initializing from a Raw Value
+// Initializing from a Raw Value
 let possiblePlanet = Planet(rawValue: 7)
 // possiblePlanet is of type Planet? and equals Planet.uranus
 
@@ -118,7 +121,8 @@ if let somePlanet = Planet(rawValue: positionToFind) {
 }
 // Prints "There isn't a planet at position 11"
 
-/// Recursive Enumerations
+
+//: ## Recursive Enumerations
 indirect enum ArithmeticExpression {
     case number(Int)
     case addition(ArithmeticExpression, ArithmeticExpression)
@@ -143,6 +147,3 @@ func evaluate(_ expression: ArithmeticExpression) -> Int {
 
 print(evaluate(product))
 // Prints "18"
-
-
-
