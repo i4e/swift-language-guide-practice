@@ -6,5 +6,6 @@
         <page name='Structures and Classes '/>
         <page name='Propertyies'/>
         <page name='Methods'/>
+        <page name='Inheritance'/>
     </pages>
 </playground>
