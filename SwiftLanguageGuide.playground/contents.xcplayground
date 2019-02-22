@@ -7,5 +7,6 @@
         <page name='Propertyies'/>
         <page name='Methods'/>
         <page name='Inheritance'/>
+        <page name='Automatic Reference Counting'/>
     </pages>
 </playground>
