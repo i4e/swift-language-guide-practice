@@ -9,5 +9,6 @@
         <page name='Inheritance'/>
         <page name='Automatic Reference Counting'/>
         <page name='Optional Chaning'/>
+        <page name='Type Casting'/>
     </pages>
 </playground>
