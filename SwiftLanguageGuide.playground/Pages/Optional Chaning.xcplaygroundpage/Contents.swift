@@ -35,18 +35,6 @@ type(of: john.residence?.numberOfRooms)  // Optional<Int>
 let paul = Person()
 type(of: paul.residence?.numberOfRooms)  // Optional<Int>
 
-// オプショナル型
-var a: String? = "hoge"
-//print(a+"a") // error
-a = nil
-// print(a+"a") // error
-
-// 有値オプショナル型
-var b: String! = "hoge"
-print(b+"a")
-b = nil
-//print(b+"a") // error
-
 
 //: ## Defining Model Classes for Optional Chaining
 
@@ -187,4 +175,53 @@ ringo.residence?.address?.buildingIdentifier()?.hasPrefix("The")
 type(of: ringo.residence?.address?.buildingIdentifier()?.hasPrefix("The")) // Bool?
 // この例では、チェーンするオプショナル値が buildingIdentifier() メソッド自体ではなく、buildingIdentifier() メソッドの戻り値であるため、丸括弧の後にオプショナルチェーンのクエスチョンマークを置いています。
 
+
+
+//: # Basics
+
+
+let possibleNumber = "123"
+let convertedNumber = Int(possibleNumber)
+var serverResponseCode: Int? = 404
+serverResponseCode = nil
+var surveyAnswer: String? // nil
+
+// If Statements and Forced Unwrapping
+if convertedNumber != nil {
+    print(convertedNumber!)
+}
+
+// Optional Binding
+if let convertedNumber = convertedNumber {
+    print(convertedNumber)
+}
+
+// 複数のオプショナルバインディング と 条件
+if let firstNumber = Int("4"), let secondNumber = Int("5"), firstNumber < secondNumber && secondNumber < 100 {
+    print("\(firstNumber) < \(secondNumber) < 100")
+}
+
+
+if let firstNumber = Int("4") {
+    if let secondNumber = Int("42") {
+        if firstNumber < secondNumber && secondNumber < 100 {
+            print("\(firstNumber) < \(secondNumber) < 100")
+        }
+    }
+}
+
+// 無条件アンラップ
+// オプショナル型
+var a: String? = "hoge"
+let forcedString: String = a!
+
+// 有値オプショナル型 (無条件アンラップ)
+var b: String! = "hoge"
+let implicitString: String = b
+
+// 以下の2例は同じ結果
+a = nil
+//let hoge: String = a! // 実行時エラー
+b = nil
+//let fuga: String = b  // 実行時エラー
 
