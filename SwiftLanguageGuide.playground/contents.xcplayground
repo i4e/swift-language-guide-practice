@@ -12,5 +12,6 @@
         <page name='Type Casting'/>
         <page name='Extensions'/>
         <page name='Protocols'/>
+        <page name='Access Control'/>
     </pages>
 </playground>
