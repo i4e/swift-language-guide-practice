@@ -11,5 +11,6 @@
         <page name='Optional Chaning'/>
         <page name='Type Casting'/>
         <page name='Extensions'/>
+        <page name='Protocols'/>
     </pages>
 </playground>
