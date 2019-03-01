@@ -8,15 +8,71 @@ import Foundation
 
 // > エクステンションは、既存のクラス、構造体、列挙型、あるいはプロトコルの型に新しい機能を追加します。これには、オリジナルのソースコードへのアクセスを持たない型の拡張（レトロアクティブモデリング）を含みます。
 
+// Extensionsでできること，できないことを説明せよ
+
 /*:
- エクステンションでできること
- コンピューテッドのインスタンスプロパティとコンピューテッドのタイププロパティを追加
- インスタンスメソッドとタイプメソッドを定義
- 新しいイニシャライザを定義
- サブスクリプトを定義
- 新しいネストされた型を定義して使用
- 既存の型をプロトコルに準拠
-*/
+ Extensions でできること: 以下の項目に関する新しい定義の追加
+ - computed instance property, stored type property, computed type property
+ - instance method, type method
+ - initializer
+ - subscript
+ - nested type
+ - protocol に準拠
+ Extensions でできないこと
+ - stored instance property のついか
+ - property observer の追加
+ - 他の extension で定義されている内容を上書き
+ */
+
+// Extension の基本文法が理解できるか
+
+struct Hoge { }
+protocol Fuga {
+    var fuga: Int { get }
+    func fugaFunction()
+}
+extension Hoge {
+//    var instanceStoredProperty: Int   // error
+    var instanceComputedProperty: Int {
+        return 1
+    }
+    static var storedTypeProperty: Int = 1
+    static var computedTypeProperty: Int {
+        return 2
+    }
+    
+    init(_ hoge: Int) {
+        print(hoge)
+    }
+    subscript(index: Int) -> String {
+        return "hoge" + String(index)
+    }
+}
+
+extension Hoge {
+    struct NestedHoge {
+        let number = 100
+    }
+    
+    func nestedHoge() {
+        let nested = NestedHoge()
+        print(nested.number)
+    }
+}
+
+extension Hoge: Fuga {
+    var fuga: Int {
+        return 1
+    }
+    func fugaFunction() {
+        print("fuga")
+    }
+}
+
+let hoge = Hoge(1)
+print(hoge[1])
+hoge.nestedHoge()
+
 
 //: ## Computed Properties
 
