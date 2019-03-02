@@ -28,10 +28,18 @@ class SomeClass: SomeSuperClass, SomeProtocol, AnotherProtocol {}
 
 //: ## Property Requierments
 
+// プロパティがストアドプロパティかコンピューテッドプロパティかは指定せず、プロパティの名前と型だけを指定
+
 protocol ProtocolOne {
+    // gettable かつ settable であることが要求されるので，
     // 定数のストアドプロパティや読み取り専用の computed property で満たすことはできない
     var mustBeSettable: Int { get set }
+    
+    // どのようなプロパティでも要件を満たすことができる
     var doesNotNeedToBeSettable: Int { get }
+    
+    // type property
+    static var someTypeProperty: Int { get set}
 }
 
 protocol FullyNamed {
@@ -39,13 +47,25 @@ protocol FullyNamed {
 }
 
 struct Person: FullyNamed {
+    // stored property として要件を満たす
     var fullName: String
 }
 let john = Person(fullName: "John Applessed")
 
+struct AnotherPerson: FullyNamed {
+    var firstName: String
+    var lastName: String
+    // computed property として要件を満たす
+    var fullName: String {
+        return "\(firstName) \(lastName)"
+    }
+}
+
+let paul = AnotherPerson(firstName: "Paul", lastName: "McCartney")
+print(paul.fullName)
+
 
 //: ## Method Requirements
-
 protocol RandomNumberGenerator {
     func random() -> Double
 }
@@ -67,15 +87,70 @@ generator.random()
 
 //: ## Mutating Method Requirements
 
+protocol Togglable {
+    mutating func toggle()
+}
+
+enum OnOffSwitch: Togglable {
+    case off, on
+    mutating func toggle() {
+        switch self {
+        case .off:
+            self = .on
+        case .on:
+            self = .off
+        }
+    }
+}
+
+var lightSwitch = OnOffSwitch.off
+lightSwitch.toggle()
+
+
+
 //: ## Initializer Requirements
-// required をつける
+
+protocol SomeProtocol2 {
+    init(someParameter: Int)
+}
+
+class SomeClass2: SomeProtocol2 {
+    // required をつける
+    required init(someParameter: Int) {
+    }
+}
+
+class SomeSuperClass2 {
+    init(someParameter: Int) {
+        
+    }
+}
+
+class SomeSubClass2: SomeSuperClass2, SomeProtocol2 {
+    // required: SomeProtocol2, override: SomeSuperClass2
+    required override init(someParameter: Int) {
+        super.init(someParameter: someParameter)
+    }
+}
+
+
 
 //: ## Protocols as Types
 
+/*:
+ プロトコルは、どのような機能もプロトコル自体に実装しません。それでも、作成したプロトコルはコードで使用するためのれっきとした型になります。
+ 
+ プロトコルが型であるため、以下を含め、他の型が使える多くの場面でプロトコルを使用することができます。
+ 
+ 関数、メソッド、イニシャライザのパラメータの型、または戻り値の型として
+ 定数、変数、プロパティの型として
+ 配列、辞書、その他コンテナ内でのアイテムの型として
+ */
+
+
 class Dice {
     let sides: Int
-    // RandomNumberGenerator プロトコルに準拠するあらゆる型のインスタンスを、そのプロパティに設定することができる
-    
+    // プロパティ generator には、RandomNumberGenerator プロトコルに準拠するあらゆる型のインスタンスを設定することができる
     let generator: RandomNumberGenerator
     init(sides: Int, generator: RandomNumberGenerator) {
         self.sides = sides
@@ -164,6 +239,7 @@ game.play()
 // Rolled a 5
 // The game lasted for 4 turns
 
+
 //: ## Adding Protocol Conformance with an Extension
 
 protocol TextRepresentable {
@@ -178,6 +254,7 @@ extension Dice: TextRepresentable {
 
 let d12 = Dice(sides: 12, generator: LinearCongruentialGenerator())
 print(d12.textualDescription)
+
 
 //: ### Conditionally Conforming to a Protocol
 
@@ -222,6 +299,9 @@ protocol SomeClassOnlyProtocol: AnyObject, SomeProtocol {
 }
 
 //: Protocol Composition
+
+// 一度に複数のプロトコルに準拠するよう型に要求すること
+
 protocol Named {
     var name: String { get }
 }
@@ -281,6 +361,24 @@ for object in objects {
 
 //: ## Optional Protocol Requirements
 
+@objc protocol CounterDataSource {
+    @objc optional func increment(forCount count: Int) -> Int
+    @objc optional var fixedIncrement: Int { get }
+}
+
+class Counter {
+    var count = 0
+    var dataSource: CounterDataSource?
+    func increment() {
+        if let amount = dataSource?.increment?(forCount: count) {
+            count += amount
+        } else if let amount = dataSource?.fixedIncrement {
+            count += amount
+        }
+    }
+}
+
+
 //: ## Protocol Extensions
 // プロトコル自体に振る舞いを追加できる
 extension RandomNumberGenerator {
@@ -288,6 +386,8 @@ extension RandomNumberGenerator {
         return random() > 0.5
     }
 }
+
+
 
 //: ### Providing Default Implementations
 extension PrettyTextRepresentable  {
